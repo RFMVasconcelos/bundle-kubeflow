@@ -356,7 +356,7 @@ def microk8s():
 @click.option(
     '-s',
     '--services',
-    default=['dns', 'storage', 'rbac', 'dashboard', 'ingress', 'metallb:10.64.140.43-10.64.140.49'],
+    default=['dns', 'storage', 'dashboard', 'ingress', 'metallb:10.64.140.43-10.64.140.49'],
     multiple=True,
 )
 @click.option('--model-defaults', default=[], multiple=True)
@@ -384,6 +384,12 @@ def setup(controller, services, model_defaults):
         'microk8s-hostpath',
         wait_msg='Waiting for storage to come up before bootstrapping',
         fail_msg='Waited too long for storage to come up!',
+    )
+    wait_for(
+        'microk8s.status',
+        '--wait-ready',
+        wait_msg='Waiting for microk8s to become ready...',
+        fail_msg=f'Couldn\'t enable {service}!',
     )
 
     juju('bootstrap', 'microk8s', controller, *model_defaults)
